@@ -22,7 +22,7 @@ FastDMM is an alternative map editor for BYOND that is designed to be more flexi
 - Run `FastDMM.jar`
 - Use the `Open DME` option to open an environment file.
 - Upon completion, use the `Open` option to select the desired map from the list.
-- Use middle mouse button to move your view and scroll wheel to zoom in/out.
+- Use middle mouse button or alt click and drag to move your view and scroll wheel to zoom in/out.
 - If you select an object and hold down control and click on a tile, and while holding your mouse button down, you move your mouse in a direction, you can specify a direction for the var.
 
 # Building FastDMM.
