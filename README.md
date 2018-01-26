@@ -41,6 +41,27 @@ In order to run the project you can replace `gradle fatCapsule` with `gradle run
 gradlew run
 ```
 
+# Credits
+
+Credits and thanks to:
+
+[monster860](https://github.com/monster860) for creating FastDMM, the alternative map editor for BYOND.
+
+[factorsofx](https://github.com/factorsofx) for contributing to FastDMM.
+
+[Quantomicus](https://github.com/Quantomicus) for contributing to FastDMM.
+
+[Chnkr](https://github.com/Chnkr) for contributing to FastDMM.
+
+[PJB3005](https://github.com/PJB3005) for contributing to FastDMM.
+
+[Cruix](https://github.com/Cruix) for contributing to FastDMM.
+
+[hecksadecimal](https://github.com/hecksadecimal) for contributing to FastDMM.
+
+[Rockdtben](https://github.com/Rockdtben) for maintaining the project today.
+
+
 # License
 
-FastDMM is licensed under the **GNU General Public License version 3** (GPLv3), with some exceptions which are marked as such.
+FastDMM is licensed under [GNU GPL v3](https://www.gnu.org/licenses/gpl-3.0.html), with some exceptions which are marked as such.
