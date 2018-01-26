@@ -43,14 +43,11 @@ gradlew run
 
 # Credits
 
-Credits and thanks to:
+Credits and thanks to original authors and contributors:
 
 [monster860](https://github.com/monster860) for creating FastDMM, the alternative map editor for BYOND.
 
 [factorsofx](https://github.com/factorsofx), [Quantomicus](https://github.com/Quantomicus), [Chnkr](https://github.com/Chnkr), [PJB3005](https://github.com/PJB3005), [Cruix](https://github.com/Cruix), [hecksadecimal](https://github.com/hecksadecimal) for contributing to FastDMM before tgstation
-
-[Rockdtben](https://github.com/Rockdtben) for maintaining the project today.
-
 
 # License
 
