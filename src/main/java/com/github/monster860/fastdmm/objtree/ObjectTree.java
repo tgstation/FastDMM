@@ -208,8 +208,7 @@ public class ObjectTree implements TreeModel {
 							break;
 						case "-":
 							if (!m.group(1).equals(".") && !m.group(3).equals("."))
-								// This doesn't make much sense "-" and then it divides. Not gonna tackle this right now... -Rockdtben
-								m.appendReplacement(outVal, (Float.parseFloat(m.group(1)) / Float.parseFloat(m.group(3)))+"");
+								m.appendReplacement(outVal, (Float.parseFloat(m.group(1)) - Float.parseFloat(m.group(3)))+"");
 							break;
 						}
 					}
