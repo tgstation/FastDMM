@@ -18,6 +18,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
 public class ObjectTree implements TreeModel {
+	public static String macroRegex = "([\\d\\.]+)[ \\t]*(\\+|\\-)[ \\t]*([\\d\\.]+)";
 	public HashMap<String,Item> items = new HashMap<>();
 	public String dmePath;
 
@@ -195,21 +196,22 @@ public class ObjectTree implements TreeModel {
 					val = outVal.toString();
 					
 					// Parse additions/subtractions.
-					m = Pattern.compile("([\\d\\.]+)[ \\t]*(\\+|\\-)[ \\t]*([\\d\\.]+)").matcher(val);
+					m = Pattern.compile(macroRegex).matcher(val);
 					outVal = new StringBuffer();
-					while(m.find()) {
-						switch(m.group(2)) {
-						
-						// If group1 or group3 is a period then this is definitely not a macro and just an eager match.
-						// Didn't feel like fixing the regex above. So this is a temporary fix. -Rockdtben
-						case "+":
-							if (!m.group(1).equals(".") && !m.group(3).equals("."))
-								m.appendReplacement(outVal, (Float.parseFloat(m.group(1)) + Float.parseFloat(m.group(3)))+"");
-							break;
-						case "-":
-							if (!m.group(1).equals(".") && !m.group(3).equals("."))
-								m.appendReplacement(outVal, (Float.parseFloat(m.group(1)) - Float.parseFloat(m.group(3)))+"");
-							break;
+					while(m.find()) 
+					{
+						switch(m.group(2)) 
+						{						
+							// If group1 or group3 is a period then this is definitely not a macro and just an eager match.
+							// Didn't feel like fixing the regex above. So this is a temporary fix. -Rockdtben
+							case "+":
+								if (!m.group(1).equals(".") && !m.group(3).equals("."))
+									m.appendReplacement(outVal, (Float.parseFloat(m.group(1)) + Float.parseFloat(m.group(3)))+"");
+								break;
+							case "-":
+								if (!m.group(1).equals(".") && !m.group(3).equals("."))
+									m.appendReplacement(outVal, (Float.parseFloat(m.group(1)) - Float.parseFloat(m.group(3)))+"");
+								break;
 						}
 					}
 					m.appendTail(outVal);
