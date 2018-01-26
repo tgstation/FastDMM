@@ -47,17 +47,7 @@ Credits and thanks to:
 
 [monster860](https://github.com/monster860) for creating FastDMM, the alternative map editor for BYOND.
 
-[factorsofx](https://github.com/factorsofx) for contributing to FastDMM.
-
-[Quantomicus](https://github.com/Quantomicus) for contributing to FastDMM.
-
-[Chnkr](https://github.com/Chnkr) for contributing to FastDMM.
-
-[PJB3005](https://github.com/PJB3005) for contributing to FastDMM.
-
-[Cruix](https://github.com/Cruix) for contributing to FastDMM.
-
-[hecksadecimal](https://github.com/hecksadecimal) for contributing to FastDMM.
+[factorsofx](https://github.com/factorsofx), [Quantomicus](https://github.com/Quantomicus), [Chnkr](https://github.com/Chnkr), [PJB3005](https://github.com/PJB3005), [Cruix](https://github.com/Cruix), [hecksadecimal](https://github.com/hecksadecimal) for contributing to FastDMM before tgstation
 
 [Rockdtben](https://github.com/Rockdtben) for maintaining the project today.
 
