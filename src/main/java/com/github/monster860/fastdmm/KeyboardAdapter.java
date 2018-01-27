@@ -1,11 +1,6 @@
 /*
  * KeyboardAdapter. This keeps track of key state and needs to be updated every tick in the Update() method.
  * 
- * TODO: boolean isKeyPressed(keycode); -- This requires keeping the previous state in memory. 
- * 		Easy to do just add a 2nd HashMap "prevKeyState"
- * TODO: boolean isKeyDown(keycode);
- * TODO: boolean isKeyUp(Keycode);
- * 
  */
 
 package com.github.monster860.fastdmm;
@@ -20,6 +15,7 @@ public class KeyboardAdapter {
 	
 	public static void updateKeys() {
 		prevKeyState = keyState;
+		keyState = (HashMap<Integer, Boolean>) keyState.clone();
 		while (Keyboard.next()) {
 			if (keyState.containsKey(Keyboard.getEventKey()))
 			{
@@ -48,7 +44,7 @@ public class KeyboardAdapter {
 	}
 	
 	//Triggers when a key is pressed and wasn't held before
-	public static boolean IsKeyPressed(int keyCode)
+	public static boolean isKeyPressed(int keyCode)
 	{
 		return keyState.getOrDefault(keyCode, false) && !prevKeyState.getOrDefault(keyCode,false);
 	}
@@ -56,6 +52,6 @@ public class KeyboardAdapter {
 	//Was Pressed now is released
 	public static boolean isKeyDePressed(int keyCode)
 	{
-		return keyState.getOrDefault(keyCode, false) && !prevKeyState.getOrDefault(keyCode,false);
+		return !keyState.getOrDefault(keyCode, false) && prevKeyState.getOrDefault(keyCode,false);
 	}
 }
