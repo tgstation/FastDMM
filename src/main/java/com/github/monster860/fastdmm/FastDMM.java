@@ -798,23 +798,27 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 			if (viewportZoom > 128)
 				viewportZoom = 128;
 		}
+		
 
-		while (Keyboard.next()) {
-			if (Keyboard.getEventKeyState()) {
-				if (Keyboard.getEventKey() == Keyboard.KEY_LCONTROL || Keyboard.getEventKey() == Keyboard.KEY_RCONTROL)
-					isCtrlPressed = true;
-				if (Keyboard.getEventKey() == Keyboard.KEY_LSHIFT || Keyboard.getEventKey() == Keyboard.KEY_RSHIFT)
-					isShiftPressed = true;
-				if (Keyboard.getEventKey() == Keyboard.KEY_LMENU || Keyboard.getEventKey() == Keyboard.KEY_RMENU)
-					isAltPressed = true;
-			} else {
-				if (Keyboard.getEventKey() == Keyboard.KEY_LCONTROL || Keyboard.getEventKey() == Keyboard.KEY_RCONTROL)
-					isCtrlPressed = false;
-				if (Keyboard.getEventKey() == Keyboard.KEY_LSHIFT || Keyboard.getEventKey() == Keyboard.KEY_RSHIFT)
-					isShiftPressed = false;
-				if (Keyboard.getEventKey() == Keyboard.KEY_LMENU || Keyboard.getEventKey() == Keyboard.KEY_RMENU)
-					isAltPressed = false;
-			}
+		
+		KeyboardAdapter.updateKeys();
+		
+		boolean undo = KeyboardAdapter.isKeyDown(Keyboard.KEY_Z);
+		boolean redo = KeyboardAdapter.isKeyDown(Keyboard.KEY_R) || KeyboardAdapter.isKeyDown(Keyboard.KEY_Y);
+		
+		isCtrlPressed = KeyboardAdapter.isKeyDown(Keyboard.KEY_LCONTROL) || KeyboardAdapter.isKeyDown(Keyboard.KEY_RCONTROL);
+		isShiftPressed = KeyboardAdapter.isKeyDown(Keyboard.KEY_LSHIFT) || KeyboardAdapter.isKeyDown(Keyboard.KEY_RSHIFT);
+		isAltPressed = KeyboardAdapter.isKeyDown(Keyboard.KEY_LMENU) || KeyboardAdapter.isKeyDown(Keyboard.KEY_RMENU);
+		
+		if (redo && isCtrlPressed)
+		{
+			ActionEvent ae = new ActionEvent(this, 1, "redo");
+			actionPerformed(ae);
+		}
+		else if (undo && isCtrlPressed)
+		{
+			ActionEvent ae = new ActionEvent(this, 1, "undo");
+			actionPerformed(ae);
 		}
 
 		if (Mouse.isButtonDown(2) || (Mouse.isButtonDown(0) && isAltPressed)) {
