@@ -12,6 +12,7 @@ import com.github.monster860.fastdmm.dmirender.IconSubstate;
 import com.github.monster860.fastdmm.objtree.ModifiedType;
 import com.github.monster860.fastdmm.objtree.ObjInstance;
 import com.github.monster860.fastdmm.objtree.ObjectTree;
+import com.github.monster860.fastdmm.objtree.ObjectTreeItem;
 
 public class TileInstance {
 	public List<ObjInstance> objs;
@@ -177,7 +178,7 @@ public class TileInstance {
 	// Removes the bottom-most occurence of the obj.
 	public String removeObject(ObjInstance obj) {
 		TileInstance ti = new TileInstance(new ArrayList<>(objs), dmm);
-		ObjectTree.Item replacement = null;
+		ObjectTreeItem replacement = null;
 		if(obj.istype("/area"))
 			replacement = dmm.objTree.get(dmm.objTree.get("/world").getVar("area"));
 		else if(obj.istype("/turf")) {
@@ -197,7 +198,7 @@ public class TileInstance {
 	
 	public String removeObjectOrSubtypes(ObjInstance obj) {
 		TileInstance ti = new TileInstance(new ArrayList<>(objs), dmm);
-		ObjectTree.Item replacement = null;
+		ObjectTreeItem replacement = null;
 		if(obj.istype("/area"))
 			replacement = dmm.objTree.get(dmm.objTree.get("/world").getVar("area"));
 		else if(obj.istype("/turf")) {

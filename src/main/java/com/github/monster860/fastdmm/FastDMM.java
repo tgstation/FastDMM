@@ -39,6 +39,7 @@ import com.github.monster860.fastdmm.objtree.InstancesRenderer;
 import com.github.monster860.fastdmm.objtree.ModifiedType;
 import com.github.monster860.fastdmm.objtree.ObjInstance;
 import com.github.monster860.fastdmm.objtree.ObjectTree;
+import com.github.monster860.fastdmm.objtree.ObjectTreeItem;
 import com.github.monster860.fastdmm.objtree.ObjectTreeParser;
 
 import org.lwjgl.LWJGLException;
@@ -101,7 +102,7 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 	SortedSet<String> filters;
 	public ObjectTree objTree;
 
-	public ObjectTree.Item selectedObject;
+	public ObjectTreeItem selectedObject;
 	public ObjInstance selectedInstance;
 
 	private boolean hasLoadedImageThisFrame = false;
@@ -371,8 +372,8 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 
 	@Override
 	public void valueChanged(TreeSelectionEvent arg0) {
-		if (arg0.getPath().getLastPathComponent() instanceof ObjectTree.Item) {
-			selectedObject = (ObjectTree.Item) arg0.getPath().getLastPathComponent();
+		if (arg0.getPath().getLastPathComponent() instanceof ObjectTreeItem) {
+			selectedObject = (ObjectTreeItem) arg0.getPath().getLastPathComponent();
 			instancesVis.setModel(selectedObject);
 			if(selectedInstance == null || objTree.get(selectedInstance.typeString()) != selectedObject)
 				selectedInstance = selectedObject;

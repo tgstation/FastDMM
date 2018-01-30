@@ -5,7 +5,7 @@ import java.util.*;
 import javax.swing.table.AbstractTableModel;
 
 import com.github.monster860.fastdmm.objtree.ModifiedType;
-import com.github.monster860.fastdmm.objtree.ObjectTree;
+import com.github.monster860.fastdmm.objtree.ObjectTreeItem;
 
 public class ModifiedTypeTableModel extends AbstractTableModel {
 	private static final long serialVersionUID = 3829092639624884439L;
@@ -26,8 +26,8 @@ public class ModifiedTypeTableModel extends AbstractTableModel {
 		displayedKeys.clear();
 		displayedVals.clear();
 		
-		List<ObjectTree.Item> parentTypes = new ArrayList<>();
-		for(ObjectTree.Item currItem = type.parent; currItem != null ;currItem = currItem.parent) {
+		List<ObjectTreeItem> parentTypes = new ArrayList<>();
+		for(ObjectTreeItem currItem = type.parent; currItem != null ;currItem = currItem.parent) {
 			parentTypes.add(0, currItem);
 		}
 		
@@ -35,7 +35,7 @@ public class ModifiedTypeTableModel extends AbstractTableModel {
 		usedVars.add("type"); // These vars are represented in the object tree for the sole purpose of compatibility with games that modify parentType.
 		usedVars.add("parentType");
 		
-		for(ObjectTree.Item currItem : parentTypes) {
+		for(ObjectTreeItem currItem : parentTypes) {
 			TreeMap<String, String> sortedVars = new TreeMap<String, String>();
 			for(Map.Entry<String,String> ent : currItem.vars.entrySet()) {
 				if(usedVars.contains(ent.getKey()))

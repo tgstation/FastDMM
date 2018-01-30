@@ -17,6 +17,7 @@ import com.google.common.collect.HashBiMap;
 import com.github.monster860.fastdmm.FastDMM;
 import com.github.monster860.fastdmm.editing.DMMDiff;
 import com.github.monster860.fastdmm.objtree.ObjectTree;
+import com.github.monster860.fastdmm.objtree.ObjectTreeItem;
 
 // DMM loader - Where you will get confused by all the regex.
 
@@ -346,7 +347,7 @@ public class DMM {
 		maxY = nMaxY;
 		maxZ = nMaxZ;
 		
-		ObjectTree.Item world = objTree.get("/world");
+		ObjectTreeItem world = objTree.get("/world");
 		if(world == null)
 			return;
 		
