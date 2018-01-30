@@ -51,9 +51,9 @@ public class ModifiedType extends ObjInstance {
 	}
 	
 	public static final ModifiedType deriveFrom(ObjInstance i) {
-		if(i instanceof ObjectTree.Item){
+		if(i instanceof ObjectTreeItem){
 			ModifiedType mt = new ModifiedType(new TreeMap<>(), i.typeString());
-			mt.parent = (ObjectTree.Item)i;
+			mt.parent = (ObjectTreeItem)i;
 			return mt;
 		} else {
 			ModifiedType p = (ModifiedType)i;
@@ -65,7 +65,7 @@ public class ModifiedType extends ObjInstance {
 	
 	public Map<String, String> vars;
 	public String parentType;
-	public ObjectTree.Item parent;
+	public ObjectTreeItem parent;
 	
 	@Override
 	public String getVar(String key) {

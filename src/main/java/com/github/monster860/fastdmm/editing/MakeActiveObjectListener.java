@@ -12,7 +12,7 @@ import com.github.monster860.fastdmm.FastDMM;
 import com.github.monster860.fastdmm.dmmmap.Location;
 import com.github.monster860.fastdmm.objtree.ModifiedType;
 import com.github.monster860.fastdmm.objtree.ObjInstance;
-import com.github.monster860.fastdmm.objtree.ObjectTree;
+import com.github.monster860.fastdmm.objtree.ObjectTreeItem;
 
 public class MakeActiveObjectListener implements ActionListener {
 	FastDMM editor;
@@ -28,10 +28,10 @@ public class MakeActiveObjectListener implements ActionListener {
 		if(editor.dmm == null)
 			return;
 		synchronized(editor) {
-			editor.selectedObject = oInstance instanceof ObjectTree.Item ? (ObjectTree.Item)oInstance : ((ModifiedType)oInstance).parent;
+			editor.selectedObject = oInstance instanceof ObjectTreeItem ? (ObjectTreeItem)oInstance : ((ModifiedType)oInstance).parent;
 			editor.selectedInstance = oInstance;
 			List<Object> path = new LinkedList<>();
-			ObjectTree.Item curr = editor.selectedObject;
+			ObjectTreeItem curr = editor.selectedObject;
 			while(curr != null && (curr.istype("/area") || curr.istype("/mob") || curr.istype("/obj") || curr.istype("/turf"))) {
 				path.add(0, curr);
 				curr = curr.parent;

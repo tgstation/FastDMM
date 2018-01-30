@@ -200,7 +200,7 @@ public class ObjectTreeParser {
                 }
                 affectedObjectPath += "/" + item;
             }
-            ObjectTree.Item item = tree.getOrCreate(affectedObjectPath);
+            ObjectTreeItem item = tree.getOrCreate(affectedObjectPath);
             if (fullPath.contains("(") && fullPath.indexOf("(") < fullPath.lastIndexOf("/"))
                 continue;
             fullPath = fullPath.replaceAll("/tmp", ""); // Let's avoid giving a shit about whether the var is tmp, static, or global.

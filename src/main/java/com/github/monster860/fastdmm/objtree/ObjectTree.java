@@ -19,7 +19,7 @@ import javax.swing.tree.TreePath;
 
 public class ObjectTree implements TreeModel {
 	public static String macroRegex = "([\\d\\.]+)[ \\t]*(\\+|\\-)[ \\t]*([\\d\\.]+)";
-	public HashMap<String,Item> items = new HashMap<>();
+	public HashMap<String,ObjectTreeItem> items = new HashMap<>();
 	public String dmePath;
 
 	// List of all FILE_DIR definitions.
@@ -34,11 +34,11 @@ public class ObjectTree implements TreeModel {
 	{
 		// Default datums
 		
-		Item datum = new Item(null, "/datum");
+		ObjectTreeItem datum = new ObjectTreeItem(null, "/datum");
 		datum.setVar("tag","null");
 		addItem(datum);
 		
-		Item atom = new Item(datum, "/atom");
+		ObjectTreeItem atom = new ObjectTreeItem(datum, "/atom");
 		atom.setVar("alpha", "255");
 		atom.setVar("appearance_flags", "0");
 		atom.setVar("blend_mode", "0");
@@ -77,7 +77,7 @@ public class ObjectTree implements TreeModel {
 		atom.setVar("verbs", "list()");
 		addItem(atom);
 		
-		Item movable = new Item(atom, "/atom/movable");
+		ObjectTreeItem movable = new ObjectTreeItem(atom, "/atom/movable");
 		movable.setVar("animate_movement", "1");
 		movable.setVar("bound_x", "0");
 		movable.setVar("bound_y", "0");
@@ -90,20 +90,20 @@ public class ObjectTree implements TreeModel {
 		movable.setVar("step_y", "0");
 		addItem(movable);
 		
-		Item area = new Item(atom, "/area");
+		ObjectTreeItem area = new ObjectTreeItem(atom, "/area");
 		area.setVar("layer", "1");
 		area.setVar("luminosity", "1");
 		addItem(area);
 		
-		Item turf = new Item(atom, "/turf");
+		ObjectTreeItem turf = new ObjectTreeItem(atom, "/turf");
 		turf.setVar("layer", "2");
 		addItem(turf);
 		
-		Item obj = new Item(movable, "/obj");
+		ObjectTreeItem obj = new ObjectTreeItem(movable, "/obj");
 		obj.setVar("layer", "3");
 		addItem(obj);
 		
-		Item mob = new Item(movable, "/mob");
+		ObjectTreeItem mob = new ObjectTreeItem(movable, "/mob");
 		mob.setVar("ckey", "null");
 		mob.setVar("density", "1");
 		mob.setVar("key", "null");
@@ -114,7 +114,7 @@ public class ObjectTree implements TreeModel {
 		mob.setVar("sight", "0");
 		addItem(mob);
 		
-		Item world = new Item(datum, "/world");
+		ObjectTreeItem world = new ObjectTreeItem(datum, "/world");
 		world.setVar("turf", "/turf");
 		world.setVar("mob", "/mob");
 		world.setVar("area", "/area");
@@ -123,7 +123,7 @@ public class ObjectTree implements TreeModel {
 		fileDirs.add(Paths.get(""));
 	}
 
-	public Item getOrCreate(String path) {
+	public ObjectTreeItem getOrCreate(String path) {
 		if(items.containsKey(path))
 			return items.get(path);
 		
@@ -132,27 +132,27 @@ public class ObjectTree implements TreeModel {
 			parentPath = path.substring(0, path.lastIndexOf("/"));
 		else
 			parentPath = "/datum";
-		Item parentItem = getOrCreate(parentPath);
-		Item item = new Item(parentItem, path);
+		ObjectTreeItem parentItem = getOrCreate(parentPath);
+		ObjectTreeItem item = new ObjectTreeItem(parentItem, path);
 		items.put(path, item);
 		return item;
 	}
 	
-	public Item get(String path) {
+	public ObjectTreeItem get(String path) {
 		if(items.containsKey(path))
 			return items.get(path);
 		else
 			return null;
 	}
 	
-	public void addItem(Item item)
+	public void addItem(ObjectTreeItem item)
 	{
 		items.put(item.path, item);
 	}
 	
 	public void dumpTree(PrintStream ps)
 	{
-		for(Item item : items.values())
+		for(ObjectTreeItem item : items.values())
 		{
 			ps.println(item.path);
 			for(Entry<String, String> var : item.vars.entrySet())
@@ -162,7 +162,7 @@ public class ObjectTree implements TreeModel {
 		}
 	}
 	
-	public Item getGlobal() {
+	public ObjectTreeItem getGlobal() {
 		return items.get("");
 	}
 
@@ -170,11 +170,11 @@ public class ObjectTree implements TreeModel {
 	public void completeTree() {
 		// Clear children and parse expressions
 		
-		Item global = getGlobal();
+		ObjectTreeItem global = getGlobal();
 		
 		System.gc();
 		
-		for(Item i : items.values()) {
+		for(ObjectTreeItem i : items.values()) {
 			i.subtypes.clear();
 			
 			for(Entry<String, String> e : i.vars.entrySet()) {
@@ -236,8 +236,8 @@ public class ObjectTree implements TreeModel {
 		}
 		System.gc();
 		// Assign parents/children
-		for(Item i : items.values()) {
-			Item parent = get(i.getVar("parentType"));
+		for(ObjectTreeItem i : items.values()) {
+			ObjectTreeItem parent = get(i.getVar("parentType"));
 			if(parent != null) {
 				i.parent = parent;
 				parent.subtypes.add(i);
@@ -245,7 +245,7 @@ public class ObjectTree implements TreeModel {
 		}
 		System.gc();
 		// Sort children
-		for(Item i : items.values()) {
+		for(ObjectTreeItem i : items.values()) {
 			i.subtypes.sort((arg0, arg1) -> arg0.path.compareToIgnoreCase(arg1.path));
 		}
 		
@@ -256,147 +256,6 @@ public class ObjectTree implements TreeModel {
 		}
 	}
 	
-	public static class Item extends ObjInstance implements ListModel<ObjInstance> {
-		public Item(Item parent, String path)
-		{
-			path = path.trim();
-			this.path = path;
-			this.parent = parent;
-			vars.put("type", path);
-			if(parent != null)
-			{
-				parent.subtypes.add(this);
-				vars.put("parentType", parent.path);
-			}
-			instances.add(this);
-		}
-		
-		public Item(String path)
-		{
-			this.path = path;
-			vars.put("type", path);
-			instances.add(this);
-		}
-		
-		public boolean istype(String path) {
-			if(this.path.equals(path))
-				return true;
-			if(parent != null)
-				return parent.istype(path);
-			return false;
-		}
-		
-		public void setVar(String key, String value)
-		{
-			vars.put(key, value);
-		}
-		
-		public void setVar(String key)
-		{
-			if(!vars.containsKey(key))
-				vars.put(key, "null");
-		}
-		
-		public String getVar(String key)
-		{
-			if(vars.containsKey(key))
-				return vars.get(key);
-			if(parent != null)
-				return parent.getVar(key);
-			return null;
-		}
-		
-		public Map<String, String> getAllVars() {
-			Map<String, String> allVars = new TreeMap<>();
-			if(parent != null)
-				allVars.putAll(parent.getAllVars());
-			allVars.putAll(vars);
-			return allVars;
-		}
-		
-		public String path = "";
-		public ArrayList<Item> subtypes = new ArrayList<>();
-		public Item parent = null;
-		public Map<String, String> vars = new TreeMap<>();
-		public List<ObjInstance> instances = new ArrayList<>();
-		
-		public void addInstance(ObjInstance instance) {
-			if(instances.contains(instance))
-				return;
-			instances.add(instance);
-			Collections.sort(instances, (o1, o2) -> {
-                if(o1 instanceof Item)
-                    return -1;
-                if(o2 instanceof Item)
-                    return 1;
-                return o1.toString().compareToIgnoreCase(o2.toString());
-            });
-			int index = instances.indexOf(instance);
-			ListDataEvent event = new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, index, index);
-			for(ListDataListener l : listeners) {
-				l.intervalAdded(event);
-			}
-		}
-		
-		public void removeInstance(ObjInstance instance) {
-			int index = instances.indexOf(instance);
-			if(index == -1)
-				return;
-			instances.remove(instance);
-			ListDataEvent event = new ListDataEvent(this, ListDataEvent.INTERVAL_REMOVED, index, index);
-			for(ListDataListener l : listeners) {
-				l.intervalRemoved(event);
-			}
-		}
-		
-		public String parentlessName() {
-			if(path.startsWith(parent.path))
-				return path.substring(parent.path.length());
-			else
-				return path;
-		}
-
-		@Override
-		public String typeString() {
-			return path;
-		}
-		
-		@Override
-		public String toString() {
-			return path;
-		}
-		
-		@Override
-		public String toStringTGM() {
-			return path;
-		}
-		
-		private HashSet<ListDataListener> listeners = new HashSet<>();
-
-		@Override
-		public void addListDataListener(ListDataListener arg0) {
-			listeners.add(arg0);
-		}
-
-		@Override
-		public ObjInstance getElementAt(int arg0) {
-			// TODO Auto-generated method stub
-			return instances.get(arg0);
-		}
-
-		@Override
-		public int getSize() {
-			// TODO Auto-generated method stub
-			return instances.size();
-		}
-
-		@Override
-		public void removeListDataListener(ListDataListener arg0) {
-			listeners.remove(arg0);
-		}
-
-	}
-
 	@Override
 	public void addTreeModelListener(TreeModelListener arg0) {
 		// We don't change.
@@ -415,8 +274,8 @@ public class ObjectTree implements TreeModel {
 			case 3:
 				return get("/turf");
 			}
-		} else if (arg0 instanceof Item) {
-			Item item = (Item)arg0;
+		} else if (arg0 instanceof ObjectTreeItem) {
+			ObjectTreeItem item = (ObjectTreeItem)arg0;
 			return item.subtypes.get(arg1);
 		}
 		return null;
@@ -426,17 +285,17 @@ public class ObjectTree implements TreeModel {
 	public int getChildCount(Object arg0) {
 		if(arg0 == this)
 			return 4;
-		if(arg0 instanceof Item) {
-			return ((Item)arg0).subtypes.size();
+		if(arg0 instanceof ObjectTreeItem) {
+			return ((ObjectTreeItem)arg0).subtypes.size();
 		}
 		return 0;
 	}
 
 	@Override
 	public int getIndexOfChild(Object arg0, Object arg1) {
-		if(!(arg1 instanceof Item))
+		if(!(arg1 instanceof ObjectTreeItem))
 			return 0;
-		Item item = (Item)arg1;
+		ObjectTreeItem item = (ObjectTreeItem)arg1;
 		if(arg0 == this) {
 			switch(item.path) {
 			case "/area":
@@ -449,8 +308,8 @@ public class ObjectTree implements TreeModel {
 				return 3;
 			}
 		}
-		if(arg0 instanceof Item)
-			return ((Item)arg0).subtypes.indexOf(arg1);
+		if(arg0 instanceof ObjectTreeItem)
+			return ((ObjectTreeItem)arg0).subtypes.indexOf(arg1);
 		return 0;
 	}
 
@@ -463,8 +322,8 @@ public class ObjectTree implements TreeModel {
 	public boolean isLeaf(Object arg0) {
 		if(arg0 == this)
 			return false;
-		if(arg0 instanceof Item)
-			return ((Item)arg0).subtypes.size() == 0;
+		if(arg0 instanceof ObjectTreeItem)
+			return ((ObjectTreeItem)arg0).subtypes.size() == 0;
 		return true;
 	}
 
