@@ -502,6 +502,7 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 			}
 		} else if("mapimage".equals(e.getActionCommand())) {
 			JFileChooser fc = new JFileChooser();
+			
 			if (fc.getChoosableFileFilters().length > 0)
 				fc.removeChoosableFileFilter(fc.getChoosableFileFilters()[0]);
 			fc.addChoosableFileFilter(new FileNameExtensionFilter("Image (*.png)", "png"));
@@ -512,6 +513,9 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 					mapImage = createMapImage(1);
 				}
 				try {
+					if (!fc.getSelectedFile().getPath().endsWith(".png"))
+						fc.setSelectedFile(new File(fc.getSelectedFile().getPath() + ".png"));					
+					
 					ImageIO.write(mapImage, "png", fc.getSelectedFile());
 				} catch (IOException e1) {
 					e1.printStackTrace();
