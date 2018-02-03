@@ -35,6 +35,7 @@ import com.github.monster860.fastdmm.editing.ui.EditorTabComponent;
 import com.github.monster860.fastdmm.editing.ui.EmptyTabPanel;
 import com.github.monster860.fastdmm.editing.ui.NoDmeTreeModel;
 import com.github.monster860.fastdmm.editing.ui.ObjectTreeRenderer;
+import com.github.monster860.fastdmm.gui.model.FastDMMOptionsModel;
 import com.github.monster860.fastdmm.objtree.InstancesRenderer;
 import com.github.monster860.fastdmm.objtree.ModifiedType;
 import com.github.monster860.fastdmm.objtree.ObjInstance;
@@ -71,6 +72,8 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 	boolean selMode = false;
 
 	public String statusstring = " ";
+	
+	public FastDMMOptionsModel options;
 
 	private JPanel leftPanel;
 	private JPanel objTreePanel;
@@ -93,6 +96,8 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 	private JMenuItem menuItemMapImage;
 	private JMenuItem menuItemUndo;
 	private JMenuItem menuItemRedo;
+	
+	private JCheckBoxMenuItem menuItemAutoSave;
 
 	private JPopupMenu currPopup;
 
@@ -124,7 +129,7 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 			e.printStackTrace();
 		}
 
-		FastDMM fastdmm = new FastDMM();
+		FastDMM fastdmm = FastDMM.getFastDMM();
 
 		fastdmm.initSwing();
 		fastdmm.interface_dmi = new DMI(Util.getFile("interface.dmi"));
@@ -143,7 +148,18 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 		}
 	}
 
-	public FastDMM() {
+	//FastDMM is now a singleton.
+	private FastDMM() {
+	}
+	
+	//FastDMM is now a singleton.
+	private static FastDMM fastDMM;
+	
+	public static FastDMM getFastDMM() {
+		if (fastDMM == null)
+			return fastDMM = new FastDMM();
+		else
+			return fastDMM;		
 	}
 
 	public void initSwing() {
@@ -285,6 +301,7 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 			menu.add(menuItemMapImage);
 
 			initRecent("dme");
+			initOptions();
 			
 			menu = new JMenu("Edit");
 			menuBar.add(menu);
@@ -309,6 +326,13 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 			menuItem.setActionCommand("change_filters");
 			menuItem.addActionListener(FastDMM.this);
 			menu.add(menuItem);
+			
+			menuItemAutoSave = new JCheckBoxMenuItem("AutoSave", options.autoSave);
+			menuItemAutoSave.setActionCommand("autoSaveToggle");
+			menuItemAutoSave.addActionListener(FastDMM.this);
+			menuItemAutoSave.setSelected(options.autoSave);
+				
+			menu.add(menuItemAutoSave);
 
 			menuItemExpand = new JMenuItem("Expand Map");
 			menuItemExpand.setActionCommand("expand");
@@ -417,6 +441,8 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 			}
 		} else if ("open_dme".equals(e.getActionCommand())) {
 			openDME();
+		} else if ("autoSaveToggle".equals(e.getActionCommand())) {
+			autoSaveToggle();			
 		} else if ("open".equals(e.getActionCommand())) {
 			openDMM();
 		} else if ("save".equals(e.getActionCommand())) {
@@ -598,6 +624,11 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 			openDME(fc.getSelectedFile());
 		}
 	}
+	
+	private void autoSaveToggle() {		
+		options.autoSave = !options.autoSave;
+		options.saveOptions();
+	}	
 
 	private void openDMM(File filetoopen) {
 		synchronized (this) {
@@ -725,7 +756,7 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 		if (interface_dmi != null) {
 			interface_dmi.createGL();
 		}
-		Thread autosaveThread = new Thread(new AutosaveDaemon(this));
+		Thread autosaveThread = new Thread(new AutosaveDaemon());
 		autosaveThread.setDaemon(true);
 		autosaveThread.start();
 	}
@@ -1189,6 +1220,10 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 			e.printStackTrace(pw);
 			JOptionPane.showMessageDialog(FastDMM.this, sw.getBuffer(), "Error", JOptionPane.ERROR_MESSAGE);
 		}
+	}
+	
+	private void initOptions() {
+		options = FastDMMOptionsModel.createOrLoadOptions();
 	}
 
 	private void initRecent(String mode) {
