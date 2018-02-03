@@ -35,6 +35,7 @@ import com.github.monster860.fastdmm.editing.ui.EditorTabComponent;
 import com.github.monster860.fastdmm.editing.ui.EmptyTabPanel;
 import com.github.monster860.fastdmm.editing.ui.NoDmeTreeModel;
 import com.github.monster860.fastdmm.editing.ui.ObjectTreeRenderer;
+import com.github.monster860.fastdmm.gui.model.FastDMMOptionsModel;
 import com.github.monster860.fastdmm.objtree.InstancesRenderer;
 import com.github.monster860.fastdmm.objtree.ModifiedType;
 import com.github.monster860.fastdmm.objtree.ObjInstance;
@@ -71,6 +72,8 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 	boolean selMode = false;
 
 	public String statusstring = " ";
+	
+	public FastDMMOptionsModel options;
 
 	private JPanel leftPanel;
 	private JPanel objTreePanel;
@@ -124,7 +127,7 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 			e.printStackTrace();
 		}
 
-		FastDMM fastdmm = new FastDMM();
+		FastDMM fastdmm = FastDMM.getFastDMM();
 
 		fastdmm.initSwing();
 		fastdmm.interface_dmi = new DMI(Util.getFile("interface.dmi"));
@@ -143,7 +146,18 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 		}
 	}
 
-	public FastDMM() {
+	//FastDMM is now a singleton.
+	private FastDMM() {
+	}
+	
+	//FastDMM is now a singleton.
+	private static FastDMM fastDMM;
+	
+	public static FastDMM getFastDMM() {
+		if (fastDMM == null)
+			return fastDMM = new FastDMM();
+		else
+			return fastDMM;		
 	}
 
 	public void initSwing() {
@@ -285,6 +299,7 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 			menu.add(menuItemMapImage);
 
 			initRecent("dme");
+			initOptions();
 			
 			menu = new JMenu("Edit");
 			menuBar.add(menu);
@@ -725,7 +740,7 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 		if (interface_dmi != null) {
 			interface_dmi.createGL();
 		}
-		Thread autosaveThread = new Thread(new AutosaveDaemon(this));
+		Thread autosaveThread = new Thread(new AutosaveDaemon());
 		autosaveThread.setDaemon(true);
 		autosaveThread.start();
 	}
@@ -1189,6 +1204,10 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 			e.printStackTrace(pw);
 			JOptionPane.showMessageDialog(FastDMM.this, sw.getBuffer(), "Error", JOptionPane.ERROR_MESSAGE);
 		}
+	}
+	
+	private void initOptions() {
+		options = FastDMMOptionsModel.createOrLoadOptions();
 	}
 
 	private void initRecent(String mode) {
