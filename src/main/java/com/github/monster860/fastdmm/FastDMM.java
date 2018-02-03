@@ -96,6 +96,8 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 	private JMenuItem menuItemMapImage;
 	private JMenuItem menuItemUndo;
 	private JMenuItem menuItemRedo;
+	
+	private JCheckBoxMenuItem menuItemAutoSave;
 
 	private JPopupMenu currPopup;
 
@@ -324,6 +326,13 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 			menuItem.setActionCommand("change_filters");
 			menuItem.addActionListener(FastDMM.this);
 			menu.add(menuItem);
+			
+			menuItemAutoSave = new JCheckBoxMenuItem("AutoSave", options.autoSave);
+			menuItemAutoSave.setActionCommand("autoSaveToggle");
+			menuItemAutoSave.addActionListener(FastDMM.this);
+			menuItemAutoSave.setSelected(options.autoSave);
+				
+			menu.add(menuItemAutoSave);
 
 			menuItemExpand = new JMenuItem("Expand Map");
 			menuItemExpand.setActionCommand("expand");
@@ -432,6 +441,8 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 			}
 		} else if ("open_dme".equals(e.getActionCommand())) {
 			openDME();
+		} else if ("autoSaveToggle".equals(e.getActionCommand())) {
+			autoSaveToggle();			
 		} else if ("open".equals(e.getActionCommand())) {
 			openDMM();
 		} else if ("save".equals(e.getActionCommand())) {
@@ -613,6 +624,11 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 			openDME(fc.getSelectedFile());
 		}
 	}
+	
+	private void autoSaveToggle() {		
+		options.autoSave = !options.autoSave;
+		options.saveOptions();
+	}	
 
 	private void openDMM(File filetoopen) {
 		synchronized (this) {

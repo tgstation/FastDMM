@@ -59,7 +59,7 @@ public class FastDMMOptionsModel {
 		}		
 	}
 	
-	private void saveOptions()
+	public void saveOptions()
 	{
 		File optionsFile = new File(optionsPath);
 		Gson gson = new Gson();
