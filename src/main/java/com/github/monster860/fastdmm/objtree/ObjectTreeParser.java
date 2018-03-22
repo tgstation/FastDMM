@@ -121,7 +121,16 @@ public class ObjectTreeParser {
             if (line.trim().startsWith("#")) {
                 line = line.trim();
                 if (line.startsWith("#include")) {
-                    String path = line.split("\"")[1];
+                    String path = "";
+                    String includeData = line.split(" ");
+                    if (includeData.startsWith("\"")){
+                        path = line.split("\"")[1];
+                    } else if (includeData.startsWith("<")) {
+                        path = includeData.substring(1, includeData.length()-1)
+                    } else {
+                        System.err.println(currentFile.getFileName() + " has an invalid #include statement: " + line);
+                        continue;
+                    }
                     if (isMainFile) {
                         lbl.setText(path);
                     }
