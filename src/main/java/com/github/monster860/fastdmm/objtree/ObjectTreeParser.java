@@ -122,9 +122,9 @@ public class ObjectTreeParser {
                 line = line.trim();
                 if (line.startsWith("#include")) {
                     String path = "";
-                    String includeData = line.split(" ");
+                    String includeData = line.split(" ")[1];
                     if (includeData.startsWith("\"") || includeData.startsWith("<")) { // "path\to\file.dm" OR <path\to\library.dme>
-                        path = includeData.substring(1, includeData.length()-1)
+                        path = includeData.substring(1, includeData.length()-1);
                     } else {
                         System.err.println(currentFile.getFileName() + " has an invalid #include statement: " + line);
                         continue;
