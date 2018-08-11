@@ -6,10 +6,10 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'application'
 
-group 'com.github.monster860'
-version '0.7.1'
+group 'com.github.tgstation'
+version '0.7.3'
 def javaLevel = 1.8
-def mainClass = 'com.github.monster860.fastdmm.FastDMM'
+def mainClass = 'com.github.tgstation.fastdmm.FastDMM'
 def nativePaths = ['windows', 'linux', 'osx'].collect { 'build/natives/' + it }
 
 repositories {
