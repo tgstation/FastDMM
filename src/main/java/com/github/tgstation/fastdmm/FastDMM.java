@@ -94,6 +94,7 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 	private JMenuItem menuItemSave;
 	private JMenuItem menuItemExpand;
 	private JMenuItem menuItemMapImage;
+	private JMenuItem menuItemExit;
 	private JMenuItem menuItemUndo;
 	private JMenuItem menuItemRedo;
 
@@ -299,6 +300,13 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 			menuItemMapImage.addActionListener(FastDMM.this);
 			menuItemMapImage.setEnabled(false);
 			menu.add(menuItemMapImage);
+			
+			menu.addSeparator();
+			
+			menuItemExit = new JMenuItem("Exit");
+			menuItemExit.setActionCommand("exit");
+			menuItemExit.addActionListener(FastDMM.this);
+			menu.add(menuItemExit);
 
 			initRecent("dme");
 			initOptions();
@@ -551,6 +559,8 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 			undoAction();
 		} else if ("redo".equals(e.getActionCommand())) {
 			redoAction();
+		} else if ("exit".equals(e.getActionCommand())) {
+			System.exit(0);
 		}
 	}
 
