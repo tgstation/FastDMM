@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.KeyboardFocusManager;
@@ -82,9 +83,13 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 	private JLabel coords;
 	public JLabel selection;
 	private JTabbedPane leftTabs;
-	private JPanel editorPanel;
+	
+	private JPanel rightPanel;
 	private JTabbedPane editorTabs;
 	private Canvas canvas;
+	
+	private JTabbedPane rightBottomTabs;
+	private JPanel rightBottomOutputpanel;
 
 	private JMenuBar menuBar;
 	private JMenu menuRecent;
@@ -101,6 +106,8 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 	private JCheckBoxMenuItem menuItemAutoSave;
 
 	private JPopupMenu currPopup;
+	
+	private PrintStream outputStream;
 
 	public JTree objTreeVis;
 	public JList<ObjInstance> instancesVis;
@@ -139,9 +146,11 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 			fastdmm.init();
 			fastdmm.loop();
 		} catch (Exception ex) {
+			// If an error gets this high you should throw an exception popup and kill the app.
 			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);
 			ex.printStackTrace(pw);
+			ex.printStackTrace();
 			JOptionPane.showMessageDialog(fastdmm, sw.getBuffer(), "Error", JOptionPane.ERROR_MESSAGE);
 			System.exit(1);
 		} finally {
@@ -151,7 +160,7 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 
 	// FastDMM is now a singleton.
 	private FastDMM() {
-	}
+	}	
 
 	// FastDMM is now a singleton.
 	private static FastDMM fastDMM;
@@ -213,9 +222,9 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 			leftTabs.addTab("Instances", instancesPanel);
 			leftPanel.add(leftTabs, BorderLayout.CENTER);
 
-			editorPanel = new JPanel();
-			editorPanel.setLayout(new BorderLayout());
-			editorPanel.add(canvas, BorderLayout.CENTER);
+			rightPanel = new JPanel();
+			rightPanel.setLayout(new BorderLayout());
+			rightPanel.add(canvas, BorderLayout.CENTER);
 
 			editorTabs = new JTabbedPane();
 			editorTabs.addChangeListener(new ChangeListener() {
@@ -241,10 +250,27 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 								+ dmm.file.getName().replaceFirst("[.][^.]+$", ""));
 					}
 				}
-			});
-			editorPanel.add(editorTabs, BorderLayout.NORTH);
+			});			
+			rightPanel.add(editorTabs, BorderLayout.NORTH);
+			
+			rightBottomTabs = new JTabbedPane();
+			rightBottomTabs.setPreferredSize(new Dimension(800, 200));
+			rightBottomTabs.addChangeListener(new ChangeListener() {
+				public void stateChanged(ChangeEvent e) {
+				}
+			});		
+						
+			JTextArea outputTextArea = new JTextArea();			
+			
+			OutputStream outputStream = new TextAreaOutputStream(outputTextArea, "Debug", Color.RED);
+			
+			System.setErr(new PrintStream(outputStream));
+			
+			rightBottomTabs.addTab("Output", new JScrollPane(outputTextArea));
+			
+			rightPanel.add(rightBottomTabs, BorderLayout.SOUTH);
 
-			getContentPane().add(editorPanel, BorderLayout.CENTER);
+			getContentPane().add(rightPanel, BorderLayout.CENTER);
 			getContentPane().add(leftPanel, BorderLayout.WEST);
 
 			setSize(1280, 720);
@@ -460,6 +486,7 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 				}
 				dmm.save();
 			} catch (Exception ex) {
+				ex.printStackTrace();
 				StringWriter sw = new StringWriter();
 				PrintWriter pw = new PrintWriter(sw);
 				ex.printStackTrace(pw);
@@ -608,6 +635,7 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 					menuRecentMaps.setVisible(true);
 					areMenusFrozen = false;
 				} catch (Exception ex) {
+					ex.printStackTrace();
 					StringWriter sw = new StringWriter();
 					PrintWriter pw = new PrintWriter(sw);
 					ex.printStackTrace(pw);
@@ -667,7 +695,7 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 				loadedMaps.add(dmm);
 				int mapIndex = loadedMaps.indexOf(dmm);
 				;
-				editorTabs.insertTab(dmm.relPath, null, new EmptyTabPanel(editorPanel), dmm.relPath, mapIndex);
+				editorTabs.insertTab(dmm.relPath, null, new EmptyTabPanel(rightPanel), dmm.relPath, mapIndex);
 				editorTabs.setTabComponentAt(mapIndex, new EditorTabComponent(this, dmm));
 				editorTabs.setSelectedIndex(mapIndex);
 				viewportX = 0;
@@ -679,6 +707,7 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 				StringWriter sw = new StringWriter();
 				PrintWriter pw = new PrintWriter(sw);
 				ex.printStackTrace(pw);
+				ex.printStackTrace();
 				JOptionPane.showMessageDialog(FastDMM.this, sw.getBuffer(), "Error", JOptionPane.ERROR_MESSAGE);
 				dmm = null;
 				menuItemExpand.setEnabled(false);
@@ -1141,6 +1170,7 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 			try {
 				Files.write(Paths.get(path), main.toString().getBytes(), StandardOpenOption.CREATE);
 			} catch (IOException e) {
+				e.printStackTrace();
 				StringWriter sw = new StringWriter();
 				PrintWriter pw = new PrintWriter(sw);
 				e.printStackTrace(pw);
@@ -1156,6 +1186,7 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 			PrintWriter pw = new PrintWriter(sw);
 			e.printStackTrace(pw);
 			JOptionPane.showMessageDialog(FastDMM.this, sw.getBuffer(), "Error", JOptionPane.ERROR_MESSAGE);
+			e.printStackTrace();
 		}
 		main = new JSONObject(new JSONTokener(Objects.requireNonNull(reader)));
 
@@ -1223,6 +1254,7 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 			writer.flush();
 			writer.close();
 		} catch (IOException e) {
+			e.printStackTrace();
 			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);
 			e.printStackTrace(pw);
@@ -1244,6 +1276,7 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 			try {
 				reader = new FileReader(recentPath);
 			} catch (FileNotFoundException e) {
+				e.printStackTrace();
 				StringWriter sw = new StringWriter();
 				PrintWriter pw = new PrintWriter(sw);
 				e.printStackTrace(pw);
@@ -1318,6 +1351,7 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 					}
 				}
 			} catch (IOException e) {
+				e.printStackTrace();
 				StringWriter sw = new StringWriter();
 				PrintWriter pw = new PrintWriter(sw);
 				e.printStackTrace(pw);
@@ -1328,6 +1362,7 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 			try {
 				Files.write(Paths.get(dummy), "".getBytes(), StandardOpenOption.CREATE);
 			} catch (IOException e) {
+				e.printStackTrace();
 				StringWriter sw = new StringWriter();
 				PrintWriter pw = new PrintWriter(sw);
 				e.printStackTrace(pw);
