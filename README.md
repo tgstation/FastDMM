@@ -11,6 +11,7 @@ FastDMM is an alternative map editor for BYOND that is designed to be more flexi
 - Prevents large diffs by minimizing changes.
 - Randomizes keys to prevent merge conflicts.
 - Requires no external dependencies! Just run a single `.jar` file!
+- Autosaving Option
 
 # Requirements
 
