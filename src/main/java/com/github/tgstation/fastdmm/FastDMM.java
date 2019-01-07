@@ -16,6 +16,7 @@ import java.util.*;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.event.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -66,9 +67,11 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 	public float viewportX = 0;
 	public float viewportY = 0;
 	public int viewportZoom = 32;
+	public int activeZ = 1;
 
 	int selX = 0;
 	int selY = 0;
+	int selZ = 0;
 
 	boolean selMode = false;
 
@@ -80,6 +83,9 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 	private JPanel objTreePanel;
 	private JPanel instancesPanel;
 	private JPanel vpData;
+	private JPanel coordData;
+	private JButton zDownButton;
+	private JButton zUpButton;
 	private JLabel coords;
 	public JLabel selection;
 	private JTabbedPane leftTabs;
@@ -188,12 +194,24 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 			vpData.setLayout(new BorderLayout());
 			vpData.setSize(350, 25);
 			vpData.setPreferredSize(vpData.getSize());
+			coordData = new JPanel();
+			coordData.setLayout(new BoxLayout(coordData, BoxLayout.X_AXIS));
+			zDownButton = new JButton("<");
+			zDownButton.setActionCommand("zdown");
+			zDownButton.addActionListener(FastDMM.this);
+			zDownButton.setEnabled(false);
+			zUpButton = new JButton(">");
+			zUpButton.setActionCommand("zup");
+			zUpButton.addActionListener(FastDMM.this);
 			coords = new JLabel(" No DME loaded.");
 			if (currPlacementHandler != null) {
 				statusstring = "No tiles selected. ";
 			}
 			selection = new JLabel(statusstring);
-			vpData.add(coords, BorderLayout.WEST);
+			coordData.add(zDownButton);
+			coordData.add(zUpButton);
+			coordData.add(coords);
+			vpData.add(coordData, BorderLayout.WEST);
 			vpData.add(selection, BorderLayout.EAST);
 			leftPanel.add(vpData, BorderLayout.SOUTH);
 
@@ -571,7 +589,7 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				BufferedImage mapImage;
 				synchronized (this) {
-					mapImage = createMapImage(1);
+					mapImage = createMapImage(activeZ);
 				}
 				try {
 					if (!fc.getSelectedFile().getPath().endsWith(".png"))
@@ -588,6 +606,22 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 			redoAction();
 		} else if ("exit".equals(e.getActionCommand())) {
 			System.exit(0);
+		} else if ("zdown".equals(e.getActionCommand())) {
+			activeZ--;
+			if (activeZ == dmm.minZ) {
+				zDownButton.setEnabled(false);
+			}
+			if (activeZ < dmm.maxZ) {
+				zUpButton.setEnabled(true);
+			}
+		} else if ("zup".equals(e.getActionCommand())){
+			activeZ++;
+			if (activeZ == dmm.maxZ) {
+				zUpButton.setEnabled(false);
+			}
+			if (activeZ > dmm.minZ) {
+				zDownButton.setEnabled(true);
+			}
 		}
 	}
 
@@ -854,7 +888,7 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 		selY = (int) Math.floor(viewportY - (ypos / viewportZoom) + yScrOff);
 
 		if ((prevSelX != selX || prevSelY != selY) && currPlacementHandler != null) {
-			currPlacementHandler.dragTo(new Location(selX, selY, 1));
+			currPlacementHandler.dragTo(new Location(selX, selY, activeZ));
 		}
 
 		if (dme == null || dmm == null) { // putting this here because it's the
@@ -902,7 +936,7 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 		if (dme != null) {
 			if (dmm != null) {
 				if (selX >= 1 && selY >= 1 && selX <= dmm.maxX && selY <= dmm.maxY) {
-					String tcoord = " " + String.valueOf(selX) + ", " + String.valueOf(selY);
+					String tcoord = " " + String.valueOf(activeZ) + ", " + String.valueOf(selX) + ", " + String.valueOf(selY);
 					coords.setText(tcoord);
 				} else {
 					coords.setText(" Out of bounds.");
@@ -928,7 +962,7 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 					currPopup = null;
 					continue;
 				}
-				Location l = new Location(selX, selY, 1);
+				Location l = new Location(selX, selY, activeZ);
 				String key = dmm.map.get(l);
 				if (Mouse.getEventButton() == 1) {
 					if (key != null) {
@@ -1030,7 +1064,7 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 			hasLoadedImageThisFrame = false;
 			Set<RenderInstance> rendInstanceSet = buildViewport(true, (int) Math.floor(viewportX - xScrOff - 2),
 					(int) Math.ceil(viewportX + xScrOff + 2), (int) Math.floor(viewportY - yScrOff - 2),
-					(int) Math.ceil(viewportY + yScrOff + 2), 1, true);
+					(int) Math.ceil(viewportY + yScrOff + 2), activeZ, true);
 
 			for (RenderInstance ri : rendInstanceSet) {
 				glColor3f(ri.color.getRed() / 255f, ri.color.getGreen() / 255f, ri.color.getBlue() / 255f);
@@ -1378,7 +1412,7 @@ public class FastDMM extends JFrame implements ActionListener, TreeSelectionList
 		BufferedImage img = new BufferedImage(imgwidth, imgheight, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = img.createGraphics();
 
-		Set<RenderInstance> rendInstanceSet = buildViewport(false, dmm.minX, dmm.maxX, dmm.minY, dmm.maxY, 1, false);
+		Set<RenderInstance> rendInstanceSet = buildViewport(false, dmm.minX, dmm.maxX, dmm.minY, dmm.maxY, zlev, false);
 
 		for (RenderInstance ri : rendInstanceSet) {
 			DMI dmi = ri.substate.dmi;
